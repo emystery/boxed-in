@@ -5,15 +5,15 @@ using UnityEngine;
 public class NewBehaviourScript : MonoBehaviour
 {
 
-    public float speed, jumpForce, feetRadius, direction;
+    public float speed, jumpForce, feetRadius, fallingForce;
 
     public float xAxis, yAxis;
 
     public bool isGrounded;
 
+    public bool isWalled;
+
     public bool boxPlaced;
-
-
 
     public LayerMask groundMask;
 
@@ -32,8 +32,9 @@ public class NewBehaviourScript : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        box = Instantiate(box, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity);
-        direction = 1;
+        //rb.AddForce(Vector3.left * speed);
+
+
 
     }
 
@@ -44,30 +45,29 @@ public class NewBehaviourScript : MonoBehaviour
         xAxis = Input.GetAxisRaw("Horizontal");
         yAxis = Input.GetAxisRaw("Vertical");
 
-        
-        if (xAxis != 0)
-        {
-            direction = xAxis;
-        }
-
+        //transform.Translate(new Vector3(xAxis, yAxis, 0) * speed * Time.deltaTime);
 
         isGrounded = Physics2D.Raycast(characterFeet.position, Vector3.down, feetRadius, groundMask);
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
         }
 
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
+        }
+
         if (boxPlaced == false)
         {
-            box.transform.SetPositionAndRotation(new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity);
-           
+            box.transform.SetPositionAndRotation(new Vector2(rb.position.x + xAxis * -2, rb.position.y + 2), Quaternion.Euler(new Vector3(0, 0, 0)));
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == false)
         {
             boxPlaced = true;
-            box.transform.SetPositionAndRotation(new Vector2(rb.position.x + direction * 3, rb.position.y), Quaternion.identity);
+            box.transform.SetPositionAndRotation(new Vector2(rb.position.x + xAxis * 2, rb.position.y), Quaternion.Euler(new Vector3(0, 0, 0)));
         }
         else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == true)
         {
@@ -84,7 +84,6 @@ public class NewBehaviourScript : MonoBehaviour
         rb.velocity = new Vector3(xAxis * speed, rb.velocity.y, 0);
 
     }
-
 
 
 

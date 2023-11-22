@@ -6,14 +6,17 @@ using UnityEngine;
 public class BoxScript : MonoBehaviour
 {
 
-    private float boxRespawnTime = 3.0f;
-    private float currentBoxRespawnTime = 0f;
-
-
+    public GameObject wallToDestroy;
+    public GameObject wallToDestroyInactive;
+    GameObject[] walls;
+    GameObject[] wallsInactive;
     // Start is called before the first frame update
     void Start()
     {
-        
+        walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
+        wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
+
+        ActivateWalls();
     }
 
     // Update is called once per frame
@@ -31,7 +34,6 @@ public class BoxScript : MonoBehaviour
 
         if (collision.gameObject.tag == "Lava")
         {
-            //Destroy(this.gameObject); // --hide box using renderer
             gameObject.SetActive(false);
         }
 
@@ -43,13 +45,29 @@ public class BoxScript : MonoBehaviour
         {
             Destroy(collision.gameObject);
         }
+
+        if (collision.gameObject.tag == "PressurePlate")
+        {
+            walls = collision.gameObject.GetComponent<PressurePlate>().walls;
+            DeactivateWalls();
+
+        }
+
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "PressurePlate")
+        {
+
+            ActivateWalls();
+        }
     }
 
     public void Respawn(Vector2 location)
     {
         transform.position = location;
         gameObject.SetActive(true);
-        print("yo");
     }
 
     public void PickUp(Vector2 location)
@@ -62,5 +80,71 @@ public class BoxScript : MonoBehaviour
     {
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = true;
+    }
+
+    private void DeactivateWalls()
+    {
+
+        foreach (GameObject wall in walls)
+        {
+            wall.SetActive(false);
+
+        }
+
+        if (wallToDestroy != null)
+        {
+            wallToDestroy.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
+        }
+
+        foreach (GameObject wallInactive in wallsInactive)
+        {
+            wallInactive.SetActive(true);
+
+        }
+
+        if (wallToDestroyInactive != null)
+        {
+            wallToDestroyInactive.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
+        }
+    }
+
+    private void ActivateWalls()
+    {
+        foreach (GameObject wall in walls)
+        {
+            wall.SetActive(true);
+
+        }
+
+        if (wallToDestroy != null)
+        {
+            wallToDestroy.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
+        }
+
+        foreach (GameObject wallInactive in wallsInactive)
+        {
+            wallInactive.SetActive(false);
+        }
+
+        if (wallToDestroyInactive != null)
+        {
+            wallToDestroyInactive.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
+        }
     }
 }

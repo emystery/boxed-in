@@ -13,6 +13,12 @@ public class PlayerController : MonoBehaviour
     public bool boxPlaced;
     Vector2 boxPosStored;
     Vector2 boxPosFloor;
+
+    public float playerWidth, boxWidth;
+
+    public bool obstacleOnTheRight;
+    public bool obstableOnTheLeft;
+
     public LayerMask groundMask;
     public Transform characterFeet;
     public GameObject boxPrefab;
@@ -30,6 +36,8 @@ public class PlayerController : MonoBehaviour
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
         direction = 1;
         boxRespawnTime = Time.fixedTime + 3.0f;
+        playerWidth = GetComponent<Renderer>().bounds.size.x;
+        boxWidth = box.GetComponent<Renderer>().bounds.size.x;
     }
 
     private void Update()
@@ -43,7 +51,15 @@ public class PlayerController : MonoBehaviour
             direction = xAxis;
         }
 
-        isGrounded = Physics2D.Raycast(characterFeet.position, Vector3.down, feetRadius, groundMask);
+        isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
+
+
+
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
 
         if (boxPlaced == false)
         {
@@ -78,9 +94,71 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == false)
         {
-            boxPlaced = true;
-            box.PlaceDown(boxPosFloor);
+            if (direction < 0)
+            {
+                if (!Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask))
+                {
+                    boxPlaced = true;
+                    box.PlaceDown(boxPosFloor);
+                }
+                else if (!Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask))
+                {
+                    boxPlaced = true;
+                    box.PlaceDown(new Vector2(rb.position.x + direction * 3 + 2 * playerWidth + 2 * boxWidth, rb.position.y));
+                }
+            }
+            else
+            {
+                if (!Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask))
+                {
+                    boxPlaced = true;
+                    box.PlaceDown(boxPosFloor);
+                }
+                else if (!Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask))
+                {
+                    boxPlaced = true;
+                    box.PlaceDown(new Vector2(rb.position.x + direction * 3 - 2 * playerWidth - 2 * boxWidth, rb.position.y));
+                }
+            }
+
         }
+
+        //obstacleOnTheRight = Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask);
+        //obstableOnTheLeft  = Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask);
+        /*
+                    if (!obstacleOnTheRight)
+                    {
+                        boxPlaced = true;
+                        box.PlaceDown(boxPosFloor);
+                        Debug.Log("right");
+
+                    } 
+                    else
+                    {
+                        Debug.Log("right no");
+                        //boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
+                        boxPlaced = true;
+                        box.PlaceDown(new Vector2(rb.position.x + direction * 3 - 2 * playerWidth - 2 * boxWidth, rb.position.y));
+                    }
+
+                    if (!obstableOnTheLeft)
+                    {
+                        boxPlaced = true;
+                        box.PlaceDown(boxPosFloor);
+                        Debug.Log("left");
+                    }
+                    else
+                    {
+                        Debug.Log("left no2");
+                        //boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
+                        boxPlaced = true;
+                        box.PlaceDown(new Vector2(rb.position.x + direction * 3 + 2 * playerWidth + 2 * boxWidth, rb.position.y));
+                    }
+                    if (obstacleOnTheRight && obstableOnTheLeft)
+                    {
+                        Debug.Log("error");
+                    }
+        */
         else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == true)
         {
             boxPlaced = false;
@@ -90,9 +168,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.velocity = new Vector3(xAxis * speed, rb.velocity.y, 0);
+        rb.velocity = new Vector2(xAxis * speed, rb.velocity.y);
 
-        if (!box.gameObject.active)
+        if (!box.gameObject.activeSelf)
         {
             currentBoxRespawnTime += Time.fixedDeltaTime;
             print(currentBoxRespawnTime);
@@ -112,7 +190,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag == "Wall")
         {
-            rb.velocity = Vector3.zero;
+            rb.velocity = Vector2.zero;
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoxScript : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class BoxScript : MonoBehaviour
     GameObject[] walls;
     GameObject[] wallsInactive;
     GameObject[] ladders;
+
+    public Sprite boxDefault;
+    public Sprite nelioBox;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +32,14 @@ public class BoxScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown("1"))
+        {
+            GetComponent<SpriteRenderer>().sprite = boxDefault;
+        }
+        else if (Input.GetKeyDown("2"))
+        {
+            GetComponent<SpriteRenderer>().sprite = nelioBox;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

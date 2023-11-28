@@ -39,11 +39,11 @@ public class BoomBaEnemy : MonoBehaviour
             return;
         }
 
-        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+        float distanceToTarget = Vector2.Distance(transform.position, target.position);
 
         if (distanceToTarget <= detectionDistance)
         {
-            Vector3 direction = (target.position - transform.position).normalized;
+            Vector2 direction = (target.position - transform.position).normalized;
             transform.Translate(direction * moveSpeed * Time.deltaTime);
         }
     }

@@ -13,17 +13,24 @@ TagManager:
   - BoxFeet
   - Spikes
   - Box
+  - WallToDestroyEasterEgg
+  - WallToDestroyInactive
+  - WallToDestroy
+  - PressurePlate
+  - Ladder
+  - PressurePlateEasterEgg
+  - ladder
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
-  - 
+  - PlayerOnLadder
+  - Platform
   - Floor
-  - 
+  - Ladder
   - 
   - 
   - 
@@ -49,4 +56,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: New Layer 1
+    uniqueID: 1100762105
     locked: 0

@@ -6,5 +6,6 @@ public class PressurePlate : MonoBehaviour
 {
     public GameObject[] walls;
     public GameObject[] wallsInactive;
+    public GameObject[] ladders;
 
 }

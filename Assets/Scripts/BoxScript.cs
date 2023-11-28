@@ -8,13 +8,18 @@ public class BoxScript : MonoBehaviour
 
     public GameObject wallToDestroy;
     public GameObject wallToDestroyInactive;
+    public GameObject easterEgg;
+    public GameObject ladder;
     GameObject[] walls;
     GameObject[] wallsInactive;
+    GameObject[] ladders;
     // Start is called before the first frame update
     void Start()
     {
         walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
         wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
+        easterEgg = GameObject.FindGameObjectWithTag("WallToDestroyEasterEgg");
+        ladders = GameObject.FindGameObjectsWithTag("ladder");
 
         ActivateWalls();
     }
@@ -50,8 +55,12 @@ public class BoxScript : MonoBehaviour
         {
             walls = collision.gameObject.GetComponent<PressurePlate>().walls;
             DeactivateWalls();
-
         }
+        else if (collision.gameObject.tag == "PressurePlateEasterEgg")
+        {
+            easterEgg.SetActive(false);
+        }
+
 
     }
 
@@ -62,6 +71,12 @@ public class BoxScript : MonoBehaviour
 
             ActivateWalls();
         }
+        else if (collision.gameObject.tag == "PressurePlateEasterEgg")
+        {
+
+            easterEgg.SetActive(true);
+        }
+
     }
 
     public void Respawn(Vector2 location)
@@ -97,7 +112,7 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
+            
         }
 
         foreach (GameObject wallInactive in wallsInactive)
@@ -112,7 +127,22 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
+            
+        }
+
+        foreach (GameObject ladder in ladders)
+        {
+            ladder.SetActive(true);
+
+        }
+
+        if (ladders != null)
+        {
+            ladder.SetActive(false);
+        }
+        else
+        {
+
         }
     }
 
@@ -130,7 +160,7 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
+            
         }
 
         foreach (GameObject wallInactive in wallsInactive)
@@ -144,7 +174,21 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
+            
+        }
+
+        foreach (GameObject ladder in ladders)
+        {
+            ladder.SetActive(false);
+        }
+
+        if (ladder != null)
+        {
+            ladder.SetActive(true);
+        }
+        else
+        {
+
         }
     }
 }

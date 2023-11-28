@@ -62,6 +62,15 @@ public class SlimeEnemy : MonoBehaviour
         {
             isMovingRight = !isMovingRight;
         }
+
+        if (collision.gameObject.tag == "Spike")
+        {
+            Destroy(this.gameObject);
+        }
+        if (collision.gameObject.tag == "Lava")
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)

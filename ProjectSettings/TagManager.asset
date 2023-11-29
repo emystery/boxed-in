@@ -17,9 +17,11 @@ TagManager:
   - WallToDestroyInactive
   - WallToDestroy
   - PressurePlate
-  - Ladder
   - PressurePlateEasterEgg
   - ladder
+  - CheckPoint
+  - EndPoint
+  - Character
   layers:
   - Default
   - TransparentFX

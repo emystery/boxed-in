@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ public class PlayerController : MonoBehaviour
     Vector2 boxPosFloor;
 
     public float playerWidth, boxWidth;
+
+    public Vector2 startPosition;
+    public GameObject checkPoint;
+    public Vector2 checkPointPos;
+    public bool checkpoint;
 
     public bool obstacleOnTheRight;
     public bool obstableOnTheLeft;
@@ -34,10 +40,13 @@ public class PlayerController : MonoBehaviour
         climbing = false;
         rb = GetComponent<Rigidbody2D>();
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
+        checkPoint = GameObject.FindGameObjectWithTag("CheckPoint");
+        checkPointPos = checkPoint.transform.position;
         direction = 1;
         boxRespawnTime = Time.fixedTime + 3.0f;
         playerWidth = GetComponent<Renderer>().bounds.size.x;
         boxWidth = box.GetComponent<Renderer>().bounds.size.x;
+        startPosition = transform.position;
     }
 
     private void Update()
@@ -52,9 +61,6 @@ public class PlayerController : MonoBehaviour
         }
 
         isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
-
-
-
 
         if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
         {
@@ -75,12 +81,10 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
         }
 
-
         if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded && climbing == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
         }
-        
 
         if (!climbing && Input.GetKeyDown(KeyCode.DownArrow))
         {
@@ -192,6 +196,19 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = Vector2.zero;
         }
+
+        if (collision.gameObject.tag == "Slime")
+        {
+            Die();
+        }
+        if (collision.gameObject.tag == "BoomBa")
+        {
+            Die();
+        }
+        if (collision.gameObject.tag == "Doorman")
+        {
+            Die();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -215,6 +232,20 @@ public class PlayerController : MonoBehaviour
                 climbing = true;
             }
         }
+
+        if (collision.gameObject.tag == "Lava")
+        {
+            Die();
+        }
+        if (collision.gameObject.tag == "Spikes")
+        {
+            Die();
+        }
+
+        if (collision.gameObject.tag == "CheckPoint")
+        {
+            checkpoint = true;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -235,5 +266,17 @@ public class PlayerController : MonoBehaviour
         gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("Player");
         rb.gravityScale = 1f;
         climbing = false;
+    }
+
+    void Die()
+    {
+        if (checkpoint)
+        {
+            transform.position = checkPointPos;
+        }
+        else
+        {
+            transform.position = startPosition;
+        }
     }
 }

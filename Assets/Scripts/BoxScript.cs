@@ -66,9 +66,7 @@ public class BoxScript : MonoBehaviour
         }
         else if (collision.gameObject.tag == "PressurePlateEasterEgg")
         {
-            easterEgg.SetActive(false);
-        }
-
+            //easterEgg.SetActive(false);
         }
 
     }

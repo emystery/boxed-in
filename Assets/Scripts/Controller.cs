@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -276,7 +277,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            transform.position = startPosition;
+            SceneManager.LoadScene("Game");
+            //transform.position = startPosition;
         }
     }
 }

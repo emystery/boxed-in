@@ -67,6 +67,7 @@ public class BoxScript : MonoBehaviour
         {
             walls = collision.gameObject.GetComponent<PressurePlate>().walls;
             DeactivateWalls();
+
         }
         else if (collision.gameObject.tag == "PressurePlateEasterEgg")
         {
@@ -80,7 +81,6 @@ public class BoxScript : MonoBehaviour
     {
         if (collision.gameObject.tag == "PressurePlate")
         {
-
             ActivateWalls();
         }
         else if (collision.gameObject.tag == "PressurePlateEasterEgg")

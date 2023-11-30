@@ -8,9 +8,10 @@ public class EndPoint : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Character")
+        if (collision.gameObject.CompareTag("Character"))
         {
-            Debug.Log("you won");
+            Debug.Log("You won!");
+
             SceneManager.LoadScene("Victory");
         }
     }

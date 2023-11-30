@@ -22,6 +22,7 @@ TagManager:
   - CheckPoint
   - EndPoint
   - Character
+  - ladderToDestroy
   layers:
   - Default
   - TransparentFX

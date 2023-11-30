@@ -8,21 +8,11 @@ public class BoomBaEnemy : MonoBehaviour
     public float detectionDistance = 5f;
     public float moveSpeed = 2.0f;
     private bool isMovingRight = true;
-    public LayerMask wallLayer;
 
     private void Update()
     {
         // Cast a ray in the direction of movement to check for walls
         Vector2 rayDirection = isMovingRight ? Vector2.right : Vector2.left;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, rayDirection, 0.1f, wallLayer);
-
-        // If the ray hits a wall, change direction
-        if (hit.collider != null)
-        {
-            isMovingRight = !isMovingRight;
-            // Flip the enemy's sprite horizontally to match the new direction
-
-        }
 
         // Move the enemy
         if (isMovingRight)
@@ -64,6 +54,16 @@ public class BoomBaEnemy : MonoBehaviour
         if (collision.gameObject.tag == "Doorman")
         {
             isMovingRight = !isMovingRight;
+        }
+
+        if (collision.gameObject.tag == "Lava")
+        {
+            Destroy(gameObject);
+        }
+
+        if (collision.gameObject.tag == "Spikes")
+        {
+            Destroy(gameObject);
         }
     }
 

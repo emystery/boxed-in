@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private float boxRespawnTime = 3.0f;
     private float currentBoxRespawnTime = 0f;
+    private float gravity = 4.0f;
 
     private void Start()
     {
@@ -68,12 +69,6 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
-        if (boxPlaced == false)
-        {
-            boxPosStored = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
-            box.transform.SetPositionAndRotation(boxPosStored, Quaternion.identity);
-        }
-
         if (climbing)
         {
             if (Input.GetKey(KeyCode.UpArrow))
@@ -95,6 +90,12 @@ public class PlayerController : MonoBehaviour
         if (climbing && !Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+
+        if (boxPlaced == false)
+        {
+            boxPosStored = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
+            box.transform.SetPositionAndRotation(boxPosStored, Quaternion.identity);
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == false)
@@ -128,42 +129,6 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        //obstacleOnTheRight = Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask);
-        //obstableOnTheLeft  = Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask);
-        /*
-                    if (!obstacleOnTheRight)
-                    {
-                        boxPlaced = true;
-                        box.PlaceDown(boxPosFloor);
-                        Debug.Log("right");
-
-                    } 
-                    else
-                    {
-                        Debug.Log("right no");
-                        //boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
-                        boxPlaced = true;
-                        box.PlaceDown(new Vector2(rb.position.x + direction * 3 - 2 * playerWidth - 2 * boxWidth, rb.position.y));
-                    }
-
-                    if (!obstableOnTheLeft)
-                    {
-                        boxPlaced = true;
-                        box.PlaceDown(boxPosFloor);
-                        Debug.Log("left");
-                    }
-                    else
-                    {
-                        Debug.Log("left no2");
-                        //boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
-                        boxPlaced = true;
-                        box.PlaceDown(new Vector2(rb.position.x + direction * 3 + 2 * playerWidth + 2 * boxWidth, rb.position.y));
-                    }
-                    if (obstacleOnTheRight && obstableOnTheLeft)
-                    {
-                        Debug.Log("error");
-                    }
-        */
         else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == true)
         {
             boxPlaced = false;
@@ -224,6 +189,16 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
+        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        {
+            if (Input.GetAxisRaw("Vertical") != 0)
+            {
+                gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("PlayerOnLadder");
+                rb.gravityScale = 0f;
+                climbing = true;
+            }
+        }
+
         if (collision.gameObject.tag == "ladder" && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
@@ -246,6 +221,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "CheckPoint")
         {
             checkpoint = true;
+            collision.GetComponent<SpriteRenderer>().color = Color.magenta;
         }
     }
 
@@ -260,25 +236,42 @@ public class PlayerController : MonoBehaviour
                 climbing = true;
             }
         }
+
+        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        {
+            if (Input.GetAxisRaw("Vertical") != 0)
+            {
+                gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("PlayerOnLadder");
+                rb.gravityScale = 0f;
+                climbing = true;
+            }
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     { 
         gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("Player");
-        rb.gravityScale = 1f;
+        rb.gravityScale = gravity;
         climbing = false;
     }
 
     void Die()
     {
-        if (checkpoint)
+        if (SceneManager.GetActiveScene().name  == "Game")
         {
-            transform.position = checkPointPos;
+            if (checkpoint)
+            {
+                transform.position = checkPointPos;
+            }
+            else
+            {
+                SceneManager.LoadScene("Game");
+                //transform.position = startPosition;
+            }
         }
-        else
+        else if (SceneManager.GetActiveScene().name == "Tutorial")
         {
-            SceneManager.LoadScene("Game");
-            //transform.position = startPosition;
+            SceneManager.LoadScene("Tutorial");
         }
     }
 }

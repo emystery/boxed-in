@@ -22,7 +22,7 @@ public class BoxScript : MonoBehaviour
     {
         walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
         wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
-        ladders = GameObject.FindGameObjectsWithTag("ladder");
+        ladders = GameObject.FindGameObjectsWithTag("ladderToDestroy");
 
         ActivateWalls();
     }

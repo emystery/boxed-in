@@ -8666,7 +8666,7 @@ Transform:
   m_GameObject: {fileID: 1557308292}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 24.489311, y: 22.033562, z: -1.1042994}
+  m_LocalPosition: {x: -66.1, y: 12.3, z: -1.1042994}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8690,12 +8690,18 @@ MonoBehaviour:
   jumpForce: 10
   feetRadius: 0.7
   direction: 0
+  fallingForce: 0
   xAxis: 0
   yAxis: 0
   isGrounded: 0
+  climbing: 0
   boxPlaced: 0
   playerWidth: 0
   boxWidth: 0
+  startPosition: {x: 0, y: 0}
+  checkPoint: {fileID: 0}
+  checkPointPos: {x: 0, y: 0}
+  checkpoint: 0
   obstacleOnTheRight: 0
   obstableOnTheLeft: 0
   groundMask:

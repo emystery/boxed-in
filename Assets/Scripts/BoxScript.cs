@@ -9,8 +9,10 @@ public class BoxScript : MonoBehaviour
 
     public GameObject wallToDestroy;
     public GameObject wallToDestroyInactive;
+    public GameObject ladder;
     GameObject[] walls;
     GameObject[] wallsInactive;
+    GameObject[] ladders;
 
     public Sprite boxDefault;
     public Sprite nelioBox;
@@ -20,6 +22,7 @@ public class BoxScript : MonoBehaviour
     {
         walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
         wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
+        ladders = GameObject.FindGameObjectsWithTag("ladder");
 
         ActivateWalls();
     }
@@ -129,6 +132,21 @@ public class BoxScript : MonoBehaviour
         {
             Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
         }
+
+        foreach (GameObject ladder in ladders)
+        {
+            ladder.SetActive(true);
+
+        }
+
+        if (ladder != null)
+        {
+            ladder.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("ladder not found. Make sure the wall has the correct tag.");
+        }
     }
 
     private void ActivateWalls()
@@ -159,7 +177,21 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
+            Debug.LogWarning("wallToDestroyInactive not found. Make sure the wall has the correct tag.");
+        }
+
+        foreach (GameObject ladder in ladders)
+        {
+            ladder.SetActive(false);
+        }
+
+        if (ladder != null)
+        {
+            ladder.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("ladder not found. Make sure the wall has the correct tag.");
         }
     }
 }

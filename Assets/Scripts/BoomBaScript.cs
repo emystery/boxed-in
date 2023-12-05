@@ -51,6 +51,11 @@ public class BoomBaEnemy : MonoBehaviour
             isMovingRight = !isMovingRight;
         }
 
+        if (collision.gameObject.tag == "BoomBa")
+        {
+            isMovingRight = !isMovingRight;
+        }
+
         if (collision.gameObject.tag == "Doorman")
         {
             isMovingRight = !isMovingRight;

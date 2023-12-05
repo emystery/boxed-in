@@ -53,6 +53,11 @@ public class SlimeEnemy : MonoBehaviour
             isCollidingWithWall = true;
         }
 
+        if (collision.gameObject.tag == "Slime")
+        {
+            isMovingRight = !isMovingRight;
+        }
+
         if (collision.gameObject.tag == "BoomBa")
         {
             isMovingRight = !isMovingRight;

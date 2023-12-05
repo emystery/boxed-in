@@ -10,9 +10,11 @@ public class BoxScript : MonoBehaviour
     public GameObject wallToDestroy;
     public GameObject wallToDestroyInactive;
     public GameObject ladder;
+    public GameObject easterEgg;
     GameObject[] walls;
     GameObject[] wallsInactive;
     GameObject[] ladders;
+    GameObject[] easterEggs;
 
     public Sprite boxDefault;
     public Sprite nelioBox;
@@ -23,6 +25,7 @@ public class BoxScript : MonoBehaviour
         walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
         wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
         ladders = GameObject.FindGameObjectsWithTag("ladderToDestroy");
+        easterEggs = GameObject.FindGameObjectsWithTag("WallToDestroyEasterEgg");
 
         ActivateWalls();
     }
@@ -69,7 +72,7 @@ public class BoxScript : MonoBehaviour
         }
         else if (collision.gameObject.tag == "PressurePlateEasterEgg")
         {
-            //easterEgg.SetActive(false);
+            DeactivateWallsEasterEgg();
         }
 
     }
@@ -79,6 +82,10 @@ public class BoxScript : MonoBehaviour
         if (collision.gameObject.tag == "PressurePlate")
         {
             ActivateWalls();
+        }
+        else if (collision.gameObject.tag == "PressurePlateEasterEgg")
+        {
+            ActivateWallsEasterEgg();
         }
     }
 
@@ -92,14 +99,49 @@ public class BoxScript : MonoBehaviour
     {
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = false;
+        transform.GetChild(0).gameObject.SetActive(false);
     }
 
     public void PlaceDown(Vector2 location)
     {
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = true;
+        transform.GetChild(0).gameObject.SetActive(true);
     }
 
+    private void DeactivateWallsEasterEgg()
+    {
+        foreach (GameObject easterEgg in easterEggs)
+        {
+            easterEgg.SetActive(false);
+
+        }
+
+        if (easterEgg != null)
+        {
+            easterEgg.SetActive(true);
+        }
+        else
+        {
+        }
+    }
+
+    private void ActivateWallsEasterEgg()
+    {
+        foreach (GameObject easterEgg in easterEggs)
+        {
+            easterEgg.SetActive(true);
+
+        }
+
+        if (easterEgg != null)
+        {
+            easterEgg.SetActive(false);
+        }
+        else
+        {
+        }
+    }
     private void DeactivateWalls()
     {
 
@@ -115,7 +157,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
         }
 
         foreach (GameObject wallInactive in wallsInactive)
@@ -130,7 +171,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroyInactive not found. Make sure the wall has the correct tag.");
         }
 
         foreach (GameObject ladder in ladders)
@@ -145,7 +185,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ladder not found. Make sure the wall has the correct tag.");
         }
     }
 
@@ -163,7 +202,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WallToDestroy not found. Make sure the wall has the correct tag.");
         }
 
         foreach (GameObject wallInactive in wallsInactive)
@@ -177,7 +215,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("wallToDestroyInactive not found. Make sure the wall has the correct tag.");
         }
 
         foreach (GameObject ladder in ladders)
@@ -191,7 +228,6 @@ public class BoxScript : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ladder not found. Make sure the wall has the correct tag.");
         }
     }
 }

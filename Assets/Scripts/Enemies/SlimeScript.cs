@@ -43,37 +43,37 @@ public class SlimeEnemy : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Box")
+        if (collision.gameObject.CompareTag("Box"))
         {
             isCollidingWithBox = true;
         }
 
-        if (collision.gameObject.tag == "Wall")
+        if (collision.gameObject.CompareTag("Wall"))
         {
             isCollidingWithWall = true;
         }
 
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             isMovingRight = !isMovingRight;
         }
 
-        if (collision.gameObject.tag == "BoomBa")
+        if (collision.gameObject.CompareTag("BoomBa"))
         {
             isMovingRight = !isMovingRight;
         }
 
-        if (collision.gameObject.tag == "Doorman")
+        if (collision.gameObject.CompareTag("Doorman"))
         {
             isMovingRight = !isMovingRight;
         }
 
-        if (collision.gameObject.tag == "Lava")
+        if (collision.gameObject.CompareTag("Lava"))
         {
             Destroy(this.gameObject);
         }
 
-        if (collision.gameObject.tag == "Spikes")
+        if (collision.gameObject.CompareTag("Spikes"))
         {
             Destroy(this.gameObject);
         }
@@ -81,12 +81,12 @@ public class SlimeEnemy : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Box")
+        if (collision.gameObject.CompareTag("Box"))
         {
             isCollidingWithBox = false;
         }
 
-        if (collision.gameObject.tag == "Wall")
+        if (collision.gameObject.CompareTag("Wall"))
         {
             isCollidingWithWall = false;
         }
@@ -96,7 +96,7 @@ public class SlimeEnemy : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Edge")
+        if (collision.gameObject.CompareTag("Edge"))
         {
             isMovingRight = !isMovingRight;
         }

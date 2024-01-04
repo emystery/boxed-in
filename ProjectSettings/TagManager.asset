@@ -23,6 +23,7 @@ TagManager:
   - EndPoint
   - Character
   - ladderToDestroy
+  - Display
   layers:
   - Default
   - TransparentFX

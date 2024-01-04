@@ -37,10 +37,16 @@ public class PlayerController : MonoBehaviour
     private float currentBoxRespawnTime = 0f;
     private float gravity = 4.0f;
 
+    private void Awake()
+    {
+        
+    }
     private void Start()
     {
         climbing = false;
-        rb = GetComponent<Rigidbody2D>();
+
+        rb = GetComponent<Rigidbody2D>();//Physicas
+
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
         checkPoint = GameObject.FindGameObjectWithTag("CheckPoint");
         checkPointPos = checkPoint.transform.position;
@@ -53,9 +59,17 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
+
+        MovementController();
+        BoxController();
+        
+    }
+
+    private void MovementController()
+    {
         xAxis = Input.GetAxisRaw("Horizontal");
         yAxis = Input.GetAxisRaw("Vertical");
-        boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
 
         if (xAxis != 0)
         {
@@ -63,11 +77,6 @@ public class PlayerController : MonoBehaviour
         }
 
         isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
-
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        }
 
         if (climbing)
         {
@@ -77,28 +86,31 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded && climbing == false)
+        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded && !climbing)
         {
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);//Physicas
         }
 
         if (!climbing && Input.GetKeyDown(KeyCode.DownArrow))
         {
-            rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
+            rb.velocity = new Vector3(rb.velocity.x, fallingForce * Time.deltaTime, 0);//Physicas
         }
 
         if (climbing && !Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
         }
-
-        if (boxPlaced == false)
+    }
+    
+    private void BoxController()
+    {
+        if (!boxPlaced)
         {
             boxPosStored = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
             box.transform.SetPositionAndRotation(boxPosStored, Quaternion.identity);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == false)
+        if (Input.GetKeyDown(KeyCode.Space) && !boxPlaced)
         {
             if (direction < 0)
             {
@@ -129,13 +141,12 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == true)
+        else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced)
         {
             boxPlaced = false;
             box.PickUp(boxPosStored);
         }
     }
-
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(xAxis * speed, rb.velocity.y);
@@ -145,7 +156,7 @@ public class PlayerController : MonoBehaviour
             currentBoxRespawnTime += Time.fixedDeltaTime;
             print(currentBoxRespawnTime);
 
-            if (currentBoxRespawnTime >= boxRespawnTime)
+            if (currentBoxRespawnTime > boxRespawnTime)
             {
                 Vector2 respawnPosition = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
 
@@ -158,20 +169,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Wall")
+        if (collision.gameObject.CompareTag("Wall"))
         {
             rb.velocity = Vector2.zero;
         }
 
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "BoomBa")
+        if (collision.gameObject.CompareTag("BoomBa"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "Doorman")
+        if (collision.gameObject.CompareTag("Doorman"))
         {
             Die();
         }
@@ -179,17 +190,17 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             Destroy(collision.gameObject);
         }
 
-        else if (collision.gameObject.tag == "BoomBa")
+        else if (collision.gameObject.CompareTag("BoomBa"))
         {
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        if (collision.gameObject.CompareTag("ladderToDestroy") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -199,7 +210,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "ladder" && !climbing)
+        if (collision.gameObject.CompareTag("ladder") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -209,16 +220,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "Lava")
+        if (collision.gameObject.CompareTag("Lava"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "Spikes")
+        if (collision.gameObject.CompareTag("Spikes"))
         {
             Die();
         }
 
-        if (collision.gameObject.tag == "CheckPoint")
+        if (collision.gameObject.CompareTag("CheckPoint"))
         {
             checkpoint = true;
             collision.GetComponent<SpriteRenderer>().color = Color.magenta;
@@ -227,7 +238,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ladder" && !climbing)
+        if (collision.gameObject.CompareTag("ladder") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -237,7 +248,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        if (collision.gameObject.CompareTag("ladderToDestroy") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -257,7 +268,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        if (SceneManager.GetActiveScene().name  == "Game")
+        if (SceneManager.GetActiveScene().name == "Game")
         {
             if (checkpoint)
             {

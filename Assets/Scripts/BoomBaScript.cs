@@ -29,13 +29,13 @@ public class BoomBaEnemy : MonoBehaviour
             return;
         }
 
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        /*float distanceToTarget = Vector2.Distance(transform.position, target.position);
 
         if (distanceToTarget <= detectionDistance)
         {
             Vector2 direction = (target.position - transform.position).normalized;
             transform.Translate(direction * moveSpeed * Time.deltaTime);
-        }
+        }*/
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

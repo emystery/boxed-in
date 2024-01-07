@@ -1,8 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -37,18 +32,27 @@ public class PlayerController : MonoBehaviour
     private float currentBoxRespawnTime = 0f;
     private float gravity = 4.0f;
 
+    private SpriteRenderer spriteRenderer;
+
+    private Animator anim;
+
     private void Start()
     {
         climbing = false;
         rb = GetComponent<Rigidbody2D>();
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
-        checkPoint = GameObject.FindGameObjectWithTag("CheckPoint");
-        checkPointPos = checkPoint.transform.position;
+        if (SceneManager.GetActiveScene().name == "Game")
+        {
+            checkPoint = GameObject.FindGameObjectWithTag("CheckPoint");
+            checkPointPos = checkPoint.transform.position;
+        }
         direction = 1;
         boxRespawnTime = Time.fixedTime + 3.0f;
         playerWidth = GetComponent<Renderer>().bounds.size.x;
         boxWidth = box.GetComponent<Renderer>().bounds.size.x;
         startPosition = transform.position;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -57,6 +61,26 @@ public class PlayerController : MonoBehaviour
         yAxis = Input.GetAxisRaw("Vertical");
         boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
 
+        if ((Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)) || ((Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)) && isGrounded))))
+        {
+            anim.SetBool("isRunning", true);
+            anim.SetBool("isGrounded", true);
+
+            if (Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)))
+            {
+                spriteRenderer.flipX = false;
+            }
+            else if (Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)))
+            {
+                spriteRenderer.flipX = true;
+            }
+        }
+        else
+        {
+            anim.SetBool("isRunning", false);
+            anim.SetBool("isGrounded", false);
+        }
+
         if (xAxis != 0)
         {
             direction = xAxis;
@@ -64,27 +88,49 @@ public class PlayerController : MonoBehaviour
 
         isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
+        if (isGrounded)
+        {
+            anim.SetBool("isGrounded", true);
+        }
+        else
+        {
+            anim.SetBool("isGrounded", false);
+        }
+
+        if ((Input.GetKeyDown(KeyCode.UpArrow) || (Input.GetKeyDown(KeyCode.W)) && isGrounded))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
         if (climbing)
         {
-            if (Input.GetKey(KeyCode.UpArrow))
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
                 rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
-            else if (Input.GetKey(KeyCode.DownArrow))
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
                 rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded && climbing == false)
+        if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) && isGrounded && climbing == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
+            anim.Play("Jump");
         }
 
-        if (!climbing && Input.GetKeyDown(KeyCode.DownArrow))
+        if (!climbing && (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)))
         {
             rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
+            anim.SetBool("isFalling", true);
+        }
+
+        float verticalVelocity = rb.velocity.y;
+
+        if (verticalVelocity < 0)
+        {
+            anim.SetBool("isFalling", true);
+        }
+        else if (isGrounded)
+        {
+            anim.SetBool("isFalling", false);
         }
 
         if (climbing && !Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class BoxScript : MonoBehaviour
@@ -68,13 +69,11 @@ public class BoxScript : MonoBehaviour
         {
             walls = collision.gameObject.GetComponent<PressurePlate>().walls;
             DeactivateWalls();
-
         }
         else if (collision.gameObject.tag == "PressurePlateEasterEgg")
         {
             DeactivateWallsEasterEgg();
         }
-
     }
 
     private void OnTriggerExit2D(Collider2D collision)

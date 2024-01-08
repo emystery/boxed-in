@@ -42,7 +42,9 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         climbing = false;
-        rb = GetComponent<Rigidbody2D>();
+
+        rb = GetComponent<Rigidbody2D>();//Physicas
+
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
         if (SceneManager.GetActiveScene().name == "Game")
         {
@@ -60,9 +62,17 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
+
+        MovementController();
+        BoxController();
+        
+    }
+
+    private void MovementController()
+    {
         xAxis = Input.GetAxisRaw("Horizontal");
         yAxis = Input.GetAxisRaw("Vertical");
-        boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
 
         if ((Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)) || ((Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)) && isGrounded))))
         {
@@ -140,14 +150,17 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
         }
-
-        if (boxPlaced == false)
+    }
+    
+    private void BoxController()
+    {
+        if (!boxPlaced)
         {
             boxPosStored = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
             box.transform.SetPositionAndRotation(boxPosStored, Quaternion.identity);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == false)
+        if (Input.GetKeyDown(KeyCode.Space) && !boxPlaced)
         {
             if (direction < 0)
             {
@@ -178,13 +191,12 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced == true)
+        else if (Input.GetKeyDown(KeyCode.Space) && boxPlaced)
         {
             boxPlaced = false;
             box.PickUp(boxPosStored);
         }
     }
-
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(xAxis * speed, rb.velocity.y);
@@ -194,7 +206,7 @@ public class PlayerController : MonoBehaviour
             currentBoxRespawnTime += Time.fixedDeltaTime;
             print(currentBoxRespawnTime);
 
-            if (currentBoxRespawnTime >= boxRespawnTime)
+            if (currentBoxRespawnTime > boxRespawnTime)
             {
                 Vector2 respawnPosition = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
 
@@ -207,20 +219,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Wall")
+        if (collision.gameObject.CompareTag("Wall"))
         {
             rb.velocity = Vector2.zero;
         }
 
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "BoomBa")
+        if (collision.gameObject.CompareTag("BoomBa"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "Doorman")
+        if (collision.gameObject.CompareTag("Doorman"))
         {
             Die();
         }
@@ -228,7 +240,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             Destroy(collision.gameObject);
         }
@@ -237,7 +249,7 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        if (collision.gameObject.CompareTag("ladderToDestroy") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -247,7 +259,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "ladder" && !climbing)
+        if (collision.gameObject.CompareTag("ladder") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -257,16 +269,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "Lava")
+        if (collision.gameObject.CompareTag("Lava"))
         {
             Die();
         }
-        if (collision.gameObject.tag == "Spikes")
+        if (collision.gameObject.CompareTag("Spikes"))
         {
             Die();
         }
 
-        if (collision.gameObject.tag == "CheckPoint")
+        if (collision.gameObject.CompareTag("CheckPoint"))
         {
             checkpoint = true;
         }
@@ -278,7 +290,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ladder" && !climbing)
+        if (collision.gameObject.CompareTag("ladder") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -288,7 +300,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "ladderToDestroy" && !climbing)
+        if (collision.gameObject.CompareTag("ladderToDestroy") && !climbing)
         {
             if (Input.GetAxisRaw("Vertical") != 0)
             {
@@ -308,7 +320,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        if (SceneManager.GetActiveScene().name  == "Game")
+        if (SceneManager.GetActiveScene().name == "Game")
         {
             if (checkpoint)
             {

@@ -19,39 +19,49 @@ public class BoxScript : MonoBehaviour
 
     public Sprite boxDefault;
     public Sprite nelioBox;
+    public LinkedList<Sprite> boxSprites = new LinkedList<Sprite>();
 
-    // Start is called before the first frame update
     void Start()
     {
         walls = GameObject.FindGameObjectsWithTag("WallToDestroy");
         wallsInactive = GameObject.FindGameObjectsWithTag("WallToDestroyInactive");
         ladders = GameObject.FindGameObjectsWithTag("ladderToDestroy");
         easterEggs = GameObject.FindGameObjectsWithTag("WallToDestroyEasterEgg");
+        gameObject.GetComponent<Collider2D>().enabled = false;
+        transform.GetChild(0).gameObject.SetActive(false);
 
         ActivateWalls();
+
+        boxSprites.InsertAtBegin(boxDefault);
+        boxSprites.InsertAtBegin(nelioBox);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("1"))
+        BoxSpriteController();
+    }
+
+    private void BoxSpriteController()
+    {
+        int index = 0;
+        foreach (Sprite sprite in boxSprites)
         {
-            GetComponent<SpriteRenderer>().sprite = boxDefault;
-        }
-        else if (Input.GetKeyDown("2"))
-        {
-            GetComponent<SpriteRenderer>().sprite = nelioBox;
+            if (Input.GetKeyDown(KeyCode.Alpha1 + index) && !boxSprites.IsEmpty())
+            {
+                GetComponent<SpriteRenderer>().sprite = sprite;
+            }
+            index++;
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "BoomBa")
+        if (collision.gameObject.CompareTag("BoomBa"))
         {
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "Lava")
+        if (collision.gameObject.CompareTag("Lava"))
         {
             gameObject.SetActive(false);
         }
@@ -60,17 +70,17 @@ public class BoxScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Slime")
+        if (collision.gameObject.CompareTag("Slime"))
         {
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "PressurePlate")
+        if (collision.gameObject.CompareTag("PressurePlate"))
         {
             walls = collision.gameObject.GetComponent<PressurePlate>().walls;
             DeactivateWalls();
         }
-        else if (collision.gameObject.tag == "PressurePlateEasterEgg")
+        else if (collision.gameObject.CompareTag("PressurePlateEasterEgg"))
         {
             DeactivateWallsEasterEgg();
         }
@@ -78,11 +88,11 @@ public class BoxScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "PressurePlate")
+        if (collision.gameObject.CompareTag("PressurePlate"))
         {
             ActivateWalls();
         }
-        else if (collision.gameObject.tag == "PressurePlateEasterEgg")
+        else if (collision.gameObject.CompareTag("PressurePlateEasterEgg"))
         {
             ActivateWallsEasterEgg();
         }
@@ -96,6 +106,7 @@ public class BoxScript : MonoBehaviour
 
     public void PickUp(Vector2 location)
     {
+        gameObject.GetComponent<Rigidbody2D>().isKinematic = true;
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = false;
         transform.GetChild(0).gameObject.SetActive(false);
@@ -103,6 +114,9 @@ public class BoxScript : MonoBehaviour
 
     public void PlaceDown(Vector2 location)
     {
+        gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
+        print(gameObject.GetComponent<Rigidbody2D>().velocity);
+
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = true;
         transform.GetChild(0).gameObject.SetActive(true);

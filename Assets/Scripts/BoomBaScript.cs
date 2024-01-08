@@ -9,6 +9,16 @@ public class BoomBaEnemy : MonoBehaviour
     public float moveSpeed = 2.0f;
     private bool isMovingRight = true;
 
+    private SpriteRenderer spriteRenderer;
+
+    private Animator anim;
+
+    private void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+    }
+
     private void Update()
     {
         // Cast a ray in the direction of movement to check for walls
@@ -18,10 +28,12 @@ public class BoomBaEnemy : MonoBehaviour
         if (isMovingRight)
         {
             transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+            spriteRenderer.flipX = false;
         }
         else
         {
             transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+            spriteRenderer.flipX = true;
         }
 
         if (target == null)

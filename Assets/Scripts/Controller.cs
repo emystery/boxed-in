@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     private Animator anim;
+
+    private const float delayToKill = 1.0f;
 
     private void Start()
     {
@@ -229,7 +232,6 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
         }
-
         else if (collision.gameObject.tag == "BoomBa")
         {
             Destroy(collision.gameObject);
@@ -267,7 +269,10 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "CheckPoint")
         {
             checkpoint = true;
-            collision.GetComponent<SpriteRenderer>().color = Color.magenta;
+        }
+        else
+        {
+
         }
     }
 

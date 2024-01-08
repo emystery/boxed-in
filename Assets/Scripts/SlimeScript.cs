@@ -11,6 +11,18 @@ public class SlimeEnemy : MonoBehaviour
     private bool isCollidingWithBox = false;
     private bool isCollidingWithWall = false;
 
+    private SpriteRenderer spriteRenderer;
+
+    private Animator anim;
+
+    private const float delayToKill = 1.0f;
+
+    private void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+    }
+
     private void Update()
     {
         // Cast a ray in the direction of movement to check for walls
@@ -29,15 +41,17 @@ public class SlimeEnemy : MonoBehaviour
         if (isMovingRight)
         {
             transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+            spriteRenderer.flipX = true;
         }
         else
         {
             transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+            spriteRenderer.flipX = false;
         }
 
         if (isCollidingWithBox && isCollidingWithWall)
         {
-            Destroy(gameObject);
+            StartCoroutine(WaitForKill());
         }
     }
 
@@ -70,12 +84,12 @@ public class SlimeEnemy : MonoBehaviour
 
         if (collision.gameObject.tag == "Lava")
         {
-            Destroy(this.gameObject);
+            StartCoroutine(WaitForKill());
         }
 
         if (collision.gameObject.tag == "Spikes")
         {
-            Destroy(this.gameObject);
+            StartCoroutine(WaitForKill());
         }
     }
 
@@ -101,6 +115,12 @@ public class SlimeEnemy : MonoBehaviour
             isMovingRight = !isMovingRight;
         }
 
+    }
+
+    private IEnumerator WaitForKill()
+    {
+        yield return new WaitForSeconds(delayToKill);
+        Destroy(this.gameObject);
     }
 }
 

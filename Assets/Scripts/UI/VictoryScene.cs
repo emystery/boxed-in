@@ -14,12 +14,12 @@ public class VictoryScene : MonoBehaviour
     {
         currentCreditText = GameObject.FindGameObjectWithTag("Display").GetComponent<TextMeshProUGUI>();
 
-        credits.Push("Credit 6");
-        credits.Push("Special Thanks: Credit 5");
-        credits.Push("Sound Effects: Credit 4");
-        credits.Push("Music: Credit 3");
-        credits.Push("Background Art: Credit 2");
-        credits.Push("World and Player Art: Credit 1");
+        credits.Push("For IADE Games Development Course");
+        credits.Push("Code: Alfredo Burnay & Afonso Martinho");
+        credits.Push("Special thanks: Célio Nódices");
+        credits.Push("Music: Opengameart.org");
+        credits.Push("Enemy and Hazard art: Pixel Adventure");
+        credits.Push("Background, Player, Tileset Art: Jesse Munguia");
     }
 
     private void Update()

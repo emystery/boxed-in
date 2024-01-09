@@ -106,7 +106,8 @@ public class BoxScript : MonoBehaviour
 
     public void PickUp(Vector2 location)
     {
-        gameObject.GetComponent<Rigidbody2D>().isKinematic = true;
+
+        gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         transform.position = location;
         gameObject.GetComponent<Collider2D>().enabled = false;
         transform.GetChild(0).gameObject.SetActive(false);
@@ -114,7 +115,6 @@ public class BoxScript : MonoBehaviour
 
     public void PlaceDown(Vector2 location)
     {
-        gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
         print(gameObject.GetComponent<Rigidbody2D>().velocity);
 
         transform.position = location;

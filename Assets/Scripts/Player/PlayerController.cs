@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public bool boxPlaced;
     Vector2 boxPosStored;
     Vector2 boxPosFloor;
+    public float boxOffset;
 
     public float playerWidth, boxWidth;
 
@@ -26,24 +26,22 @@ public class PlayerController : MonoBehaviour
     public Transform characterFeet;
     public GameObject boxPrefab;
 
-    private BoxScript box;
+    public BoxScript box;
 
     private Rigidbody2D rb;
-    private float boxRespawnTime = 3.0f;
-    private float currentBoxRespawnTime = 0f;
+    public float boxRespawnTime = 3.0f;
+    public float currentBoxRespawnTime = 0f;
     private float gravity = 4.0f;
 
     private SpriteRenderer spriteRenderer;
 
     private Animator anim;
 
-    private const float delayToKill = 1.0f;
-
     private void Start()
     {
         climbing = false;
 
-        rb = GetComponent<Rigidbody2D>();//Physicas
+        rb = GetComponent<Rigidbody2D>();
 
         box = Instantiate(boxPrefab, new Vector2(rb.position.x + direction * -2, rb.position.y + 2), Quaternion.identity).GetComponent<BoxScript>();
         if (SceneManager.GetActiveScene().name == "Game")
@@ -64,6 +62,23 @@ public class PlayerController : MonoBehaviour
     {
         boxPosFloor = new Vector2(rb.position.x + direction * 3, rb.position.y);
 
+        if (!box.gameObject.activeSelf)
+        {
+            currentBoxRespawnTime += Time.deltaTime;
+            print(currentBoxRespawnTime);
+
+            if (currentBoxRespawnTime > boxRespawnTime)
+            {
+                Vector2 respawnPosition = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
+                box.gameObject.SetActive(true);
+
+                box.Respawn(respawnPosition);
+                boxPlaced = false;
+                currentBoxRespawnTime = 0;
+            }
+        }
+
+        FlipAnim();
         MovementController();
         BoxController();
         
@@ -74,32 +89,23 @@ public class PlayerController : MonoBehaviour
         xAxis = Input.GetAxisRaw("Horizontal");
         yAxis = Input.GetAxisRaw("Vertical");
 
-        if ((Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)) || ((Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)) && isGrounded))))
-        {
-            anim.SetBool("isRunning", true);
-            anim.SetBool("isGrounded", true);
-
-            if (Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)))
-            {
-                spriteRenderer.flipX = false;
-            }
-            else if (Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)))
-            {
-                spriteRenderer.flipX = true;
-            }
-        }
-        else
-        {
-            anim.SetBool("isRunning", false);
-            anim.SetBool("isGrounded", false);
-        }
+        isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
 
         if (xAxis != 0)
         {
             direction = xAxis;
         }
 
-        isGrounded = Physics2D.Raycast(characterFeet.position, Vector2.down, feetRadius, groundMask);
+        if (xAxis != 0 && isGrounded)
+        {
+            anim.SetBool("isRunning", true);
+            anim.SetBool("isGrounded", true);
+        }
+        else
+        {
+            anim.SetBool("isRunning", false);
+            anim.SetBool("isGrounded", false);
+        }
 
         if (isGrounded)
         {
@@ -110,28 +116,23 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isGrounded", false);
         }
 
-        if ((Input.GetKeyDown(KeyCode.UpArrow) || (Input.GetKeyDown(KeyCode.W)) && isGrounded))
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        }
-
         if (climbing)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-                rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-                rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
+            if (yAxis > 0)
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            else if (yAxis < 0)
+                rb.velocity = new Vector2(rb.velocity.x, fallingForce);
         }
 
-        if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) && isGrounded && climbing == false)
+        if (yAxis > 0 && isGrounded && !climbing)
         {
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce, 0);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             anim.Play("Jump");
         }
 
-        if (!climbing && (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)))
+        if (yAxis < 0 && !climbing)
         {
-            rb.velocity = new Vector3(rb.velocity.x, fallingForce, 0);
+            rb.velocity = new Vector2(rb.velocity.x, fallingForce);
             anim.SetBool("isFalling", true);
         }
 
@@ -146,14 +147,28 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isFalling", false);
         }
 
-        if (climbing && !Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
+        if (climbing && yAxis == 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+    }
+
+    private void FlipAnim()
+    {
+        if (xAxis > 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (xAxis < 0)
+        {
+            spriteRenderer.flipX = true;
         }
     }
     
     private void BoxController()
     {
+        boxOffset = playerWidth * 1.5f + boxWidth;
+
         if (!boxPlaced)
         {
             boxPosStored = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
@@ -164,12 +179,12 @@ public class PlayerController : MonoBehaviour
         {
             if (direction < 0)
             {
-                if (!Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask))
+                if (!Physics2D.Raycast(transform.position, Vector2.left,boxOffset, groundMask))
                 {
                     boxPlaced = true;
                     box.PlaceDown(boxPosFloor);
                 }
-                else if (!Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask))
+                else if (!Physics2D.Raycast(transform.position, Vector2.right, boxOffset, groundMask))
                 {
                     boxPlaced = true;
                     box.PlaceDown(new Vector2(rb.position.x + direction * 3 + 2 * playerWidth + 2 * boxWidth, rb.position.y));
@@ -177,12 +192,12 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                if (!Physics2D.Raycast(transform.position, Vector2.right, playerWidth * 2 + boxWidth, groundMask))
+                if (!Physics2D.Raycast(transform.position, Vector2.right, boxOffset, groundMask))
                 {
                     boxPlaced = true;
                     box.PlaceDown(boxPosFloor);
                 }
-                else if (!Physics2D.Raycast(transform.position, Vector2.left, playerWidth * 2 + boxWidth, groundMask))
+                else if (!Physics2D.Raycast(transform.position, Vector2.left, boxOffset, groundMask))
                 {
                     boxPlaced = true;
                     box.PlaceDown(new Vector2(rb.position.x + direction * 3 - 2 * playerWidth - 2 * boxWidth, rb.position.y));
@@ -200,21 +215,6 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(xAxis * speed, rb.velocity.y);
-
-        if (!box.gameObject.activeSelf)
-        {
-            currentBoxRespawnTime += Time.fixedDeltaTime;
-            print(currentBoxRespawnTime);
-
-            if (currentBoxRespawnTime > boxRespawnTime)
-            {
-                Vector2 respawnPosition = new Vector2(rb.position.x + direction * -2, rb.position.y + 2);
-
-                box.Respawn(respawnPosition);
-                boxPlaced = false;
-                currentBoxRespawnTime = 0;
-            }
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -240,18 +240,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Slime"))
-        {
-            Destroy(collision.gameObject);
-        }
-        else if (collision.gameObject.tag == "BoomBa")
-        {
-            Destroy(collision.gameObject);
-        }
-
         if (collision.gameObject.CompareTag("ladderToDestroy") && !climbing)
         {
-            if (Input.GetAxisRaw("Vertical") != 0)
+            if (yAxis != 0)
             {
                 gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("PlayerOnLadder");
                 rb.gravityScale = 0f;
@@ -261,7 +252,7 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.CompareTag("ladder") && !climbing)
         {
-            if (Input.GetAxisRaw("Vertical") != 0)
+            if (yAxis != 0)
             {
                 gameObject.layer = characterFeet.gameObject.layer = LayerMask.NameToLayer("PlayerOnLadder");
                 rb.gravityScale = 0f;

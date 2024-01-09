@@ -24,6 +24,7 @@ TagManager:
   - Character
   - ladderToDestroy
   - Display
+  - PlayerFeet
   layers:
   - Default
   - TransparentFX

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -13,8 +12,6 @@ public class VictoryScene : MonoBehaviour
     public float delayAfterVictoryScene = 2f;
     void Start()
     {
-        //StartCoroutine(LoadSceneWithDelay());
-
         currentCreditText = GameObject.FindGameObjectWithTag("Display").GetComponent<TextMeshProUGUI>();
 
         credits.Push("Credit 6");

@@ -1,59 +1,53 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BoomBaEnemy : MonoBehaviour
 {
     public Transform target = null;
-    public float detectionDistance = 5f;
     public float moveSpeed = 2.0f;
     private bool isMovingRight = true;
+    private const float delayToKill = 2.0f;
+
 
     private SpriteRenderer spriteRenderer;
 
-    private Animator anim;
+    public bool alive;
+
+    public Animator animator;
 
     private void Start()
     {
+        alive = true;
         spriteRenderer = GetComponent<SpriteRenderer>();
-        anim = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        if (target == null)
+        if (alive)
         {
-            target = GameObject.FindGameObjectWithTag("Box").transform;
-        }
+            Vector2 rayDirection = isMovingRight ? Vector2.right : Vector2.left;
 
-        // Cast a ray in the direction of movement to check for walls
-        Vector2 rayDirection = isMovingRight ? Vector2.right : Vector2.left;
+            if (isMovingRight)
+            {
+                transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+                spriteRenderer.flipX = false;
+            }
+            else
+            {
+                transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+                spriteRenderer.flipX = true;
+            }
 
-        // Move the enemy
-        if (isMovingRight)
-        {
-            transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
-            spriteRenderer.flipX = false;
+            if (target == null)
+            {
+                return;
+            }
         }
         else
         {
-            transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
-            spriteRenderer.flipX = true;
+            gameObject.GetComponent<CircleCollider2D>().enabled = false;
         }
-
-        if (target == null)
-        {
-            return;
-        }
-
-        /*float distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-        if (distanceToTarget <= detectionDistance)
-        {
-            GetComponent<SpriteRenderer>().color = Color.yellow;
-            Vector2 direction = (target.position - transform.position).normalized;
-            transform.Translate(direction * moveSpeed * Time.deltaTime);
-        }*/
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -80,18 +74,19 @@ public class BoomBaEnemy : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Lava"))
         {
-            Destroy(gameObject);
+            alive = false;
+            animator.SetBool("Killed", true);
+
+            StartCoroutine(WaitForKill());
         }
 
         if (collision.gameObject.CompareTag("Spikes"))
         {
-            Destroy(gameObject);
-        }
-    }
+            alive = false;
+            animator.SetBool("Killed", true);
 
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-      
+            StartCoroutine(WaitForKill());
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -101,5 +96,18 @@ public class BoomBaEnemy : MonoBehaviour
             isMovingRight = !isMovingRight;
         }
 
+        if (collision.gameObject.CompareTag("PlayerFeet"))
+        {
+            alive = false;
+            animator.SetBool("Killed", true);
+
+            StartCoroutine(WaitForKill());
+        }
+    }
+
+    private IEnumerator WaitForKill()
+    {
+        yield return new WaitForSeconds(delayToKill);
+        Destroy(this.gameObject);
     }
 }
